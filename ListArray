@@ -1,0 +1,521 @@
+//author - Joseph Walker
+
+public class ListArray<T> implements List<T> {
+
+    /**
+     * This is a list of T objects implemented with an array. The list may have
+     * duplicates. It is not in sorted order. Add and remove operate at the end
+     * of the list by default, but positional information can be provided to
+     * operate in the middle of the list.
+     */
+    /**
+     * Array to store items in queue
+     */
+    protected T[] items;
+
+    /**
+     * The maximum size of the array for all queues
+     */
+    protected static final int DEFAULT_CAPACITY = 2000;
+
+    /**
+     * The capacity of the instance array (set to default). "capacity" is the
+     * equivalent to items.length() and can be used interchangeably.
+     */
+    private int capacity = DEFAULT_CAPACITY;
+
+    /**
+     * The number of items in the array.
+     */
+    private int numberOfItems = 0;
+
+    /**
+     * Is true if an error is printed. Will print an error if a method has an
+     * error.
+     */
+    private boolean print_error = true;
+
+    // ============== 3 Overloaded Constructors ============== //
+    /**
+     * Constructor
+     *
+     * @param size The capacity of the list (i.e. max number of elements)
+     */
+    public ListArray(int size) {
+        capacity = size;
+        // from Frank Carrano : Data Structures
+        // cast is safe because new array contains null entries
+        @SuppressWarnings("unchecked")
+        T[] tempArray = (T[]) new Object[capacity];
+        items = tempArray;
+    }
+
+    /**
+     * Default Constructor
+     */
+    public ListArray() {
+        this(DEFAULT_CAPACITY);
+    }
+
+    // ************   SETTERS, GETTERS, toPrint ******************* //
+    @Override
+    public int length() {
+        return numberOfItems;
+    }
+
+    @Override
+    public int capacity() {
+        return capacity;
+    }
+
+    /** Setter to adjust wether or not the method prints errors.
+     * A setter for the true or false print_error A setter for the true or false print_error
+     *
+     * @param change - the value to turn on or off print error
+     */
+    public void print_error(boolean change) {
+        this.print_error = change;
+    }
+
+    /**
+     * @return True if structure is at capacity.
+     */
+    @Override
+    public boolean isFull() {
+        return (capacity == numberOfItems);
+    }
+
+    /**
+     * @return True if no elements in data structure.
+     */
+    @Override
+    public boolean isEmpty() {
+        return (numberOfItems == 0);
+    }
+
+    /**
+     * Prints numbered list of songs. Prints numbered list of songs.
+     */
+    @Override
+    public String toString() {
+        String printedList = "";
+        for (int i = 0; i < numberOfItems; i++) {
+            printedList += (i + 1) + ". " + items[i].toString() + "\n";
+        }
+        return printedList;
+    } // end toString()
+
+    // *******************   REMOVE and ADD ******************* //
+    /**
+     * Removes an element at the end of the list Removes an element at the end
+     * of the list
+     *
+     * @return - the removed element
+     */
+    @Override
+    public T remove() {
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE TO REMOVE: Empty list.");
+            }
+            return null;
+        }
+        T temp = items[numberOfItems - 1];
+        items[numberOfItems - 1] = null;
+        numberOfItems--;
+        return temp;
+    } // end remove()
+
+    /**
+     * Removes a T at the specified index and then shifts the elements Removes a
+     * T at the specified index and then shifts the elements to fill in the
+     * gaps.
+     *
+     * @param index Index to remove the element
+     * @return - returns the element removed
+     */
+    @Override
+    public T remove(int index) {
+        if (index > capacity || index >= numberOfItems) {
+            if (print_error) {
+                System.out.println("FAILURE TO REMOVE: Index Invalid.");
+            }
+            return null;
+        }
+        if (index == numberOfItems - 1) {
+            T removed = items[index];
+            items[index] = null;
+            numberOfItems--;
+            return removed;
+        }
+        if (index < numberOfItems - 1 && index >= 0) {
+            T removed = items[index];
+            for (int i = index; i < numberOfItems - 1; i++) {
+                items[i] = items[i + 1];
+            }
+            items[numberOfItems - 1] = null;
+            numberOfItems--;
+            return removed;
+        }
+        return null;
+    } // end remove(int)
+
+    /**
+     * Removes a specific T within the list and then shifts the elements.
+     * Removes a specific T within the list and then shifts the elements in the
+     * list
+     *
+     * @param song - T to remove from the list
+     */
+    @Override
+    public void remove(T song) {
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE TO REMOVE SONG. List is empty.");
+            }
+            return;
+        }
+        int index = find(song);
+        if (index == numberOfItems - 1) {
+            items[index] = null;
+            numberOfItems--;
+            return;
+        }
+        if (index == -1) {
+            if (print_error) {
+                System.out.println("FAILURE TO REMOVE: SONG WAS NOT FOUND.");
+            }
+            return;
+        }
+        if (index >= 0) {
+            for (int i = index; i < numberOfItems - 1; i++) {
+                items[i] = items[i + 1];
+            }
+            items[numberOfItems - 1] = null;
+            numberOfItems--;
+        }
+    }// end remove(Song)
+
+    /**
+     * Removes all elements in the array and replaces them with null. Removes
+     * all elements in the array and replaces them with null.
+     */
+    @Override
+    public void removeAll() {
+        for (int i = 0; i < numberOfItems; i++) {
+            items[i] = null;
+        }
+        numberOfItems = 0;
+    } // end removeAll()
+
+    /**
+     * Adds a T to the end of the list Add - adds a T to the end of the list
+     *
+     * @param song - the song to add into the function
+     */
+    @Override
+    public void add(T song) {
+        if (isFull()) {
+            if (print_error) {
+                System.out.println("FAILURE TO ADD: List is full.");
+            }
+        } else {
+            items[numberOfItems] = song;
+            numberOfItems++;
+        }
+    } // end add(song)
+
+    /**
+     * Adds a T at a given index, then shifts the elements to make room. Add -
+     * adds a T at a given index, then shifts the elements to make room.
+     *
+     * @param song - the song to add into the list.
+     * @param index - the index to add the song into the list.
+     */
+    @Override
+    public void add(T song, int index) {
+        if ((index >= capacity)) {
+            if (print_error) {
+                System.out.println("FAILURE TO ADD: Index out of bounds.");
+            }
+            return;
+        }
+        if (isFull()) {
+            if (print_error) {
+                System.out.println("FAILURE TO ADD: List is full.");
+            }
+            return;
+        }
+        if (index == numberOfItems) {
+            items[index] = song;
+            numberOfItems++;
+            return;
+        }
+        if (index > 0 && index < numberOfItems) {
+            numberOfItems++;
+
+            for (int i = numberOfItems - 1; i > index; i--) {
+                items[i] = items[i - 1];
+            }
+            items[index] = song;
+
+        }
+
+    }
+    // end add(T, int)
+
+// *******************   FIND, PEEK *************** //
+    /**
+     * Returns an item at an index if the index is valid. Peek - method that
+     * returns an item at an index if the index is valid. Returns null if index
+     * is invalid.
+     *
+     * @param index The index of the array
+     * @return The T at the index.
+     */
+    @Override
+    public T peek(int index) {
+        if ((index >= capacity)) {
+            if (print_error) {
+                System.out.println("FAILURE IN PEEK: Index out of bound: " + index);
+            }
+            return null;
+        }
+        if (items[index] == null) {
+            if (print_error) {
+                System.out.println("FAILURE IN PEEK: Index is null: " + index);
+            }
+            return null;
+        }
+        return items[index];
+
+    } // end peek(int)
+
+    /**
+     * Finds a T within an array list and returns the index. Find - finds a T
+     * within an array list and returns the index. Returns -1 if song not in
+     * list.
+     *
+     * @param song The T to search for the index
+     * @return Index of the song in or out of the list.
+     */
+    @Override
+    public int find(T song) {
+        for (int i = 0; i < numberOfItems; i++) {
+            T check = items[i];
+            if (check.equals(song)) {
+                return i;
+            }
+        }
+        return -1;
+    } // end find(Song)
+
+    // *******************  Set, toArray *************** //
+    /**
+     * Set method which overwrites a value at the given index Set method which
+     * overwrites a value at the given index and with a new value.
+     *
+     * @param position - Index of the List/Array to be replaced.
+     * @param value - The value T to overwrite at the index
+     */
+    @Override
+    public void set(int position, T value) {
+        if (position >= capacity) {
+            if (print_error) {
+                System.out.println("FAILURE TO SET: Invalid Index: " + position);
+            }
+            return;
+        }
+        if (isEmpty()) {
+            add(value);
+        }
+        if (position >= 0 && position < numberOfItems) {
+            items[position] = value;
+        } else {
+            if (print_error) {
+                System.out.println("FAILURE TO SET: Check Code");
+            }
+        }
+    }// end set(Int, T)
+
+    /**
+     * Converts the values of the list into an array. Converts the values of the
+     * list into an array.
+     *
+     * @param array - The Array to be created from the list.
+     */
+    @Override
+    public void toArray(T[] array) {
+        if (array.length < numberOfItems) {
+            if (print_error) {
+                System.out.println("FAILURE TOARRAY: Array size to small.");
+            }
+            return;
+        }
+        for (int i = 0; i < numberOfItems; i++) {
+            array[i] = items[i];
+        }
+    } // end toArray(T[])
+
+    // *******************  sublist, addAll *************** //
+    /**
+     * Creates a sub array of larger array at two given indices (Inclusive).
+     * method creates a new ListArray and fills it with the elements from items
+     * between startIndex and endIndex, inclusive.
+     *
+     * @param startIndex int - first index to begin the sub-list
+     * @param endIndex int - ending index to finish the sub-list
+     * @return - A listArray of filled in elements
+     */
+    @Override
+    public ListArray<T> sublist(int startIndex, int endIndex) {
+        if ((startIndex < 0 || startIndex > capacity) || startIndex > endIndex) {
+            if (print_error) {
+                System.out.println("FAILURE IN SUBLIST: Index out of bound: " + startIndex);
+            }
+            return null;
+        }
+        if (endIndex < 0 || endIndex > numberOfItems) {
+            if (print_error) {
+                System.out.println("FAILURE IN SUBLIST: Index out of bound: " + startIndex);
+            }
+            return null;
+        } else {
+            ListArray<T> newList = new ListArray<>(endIndex + 1);
+            for (int i = startIndex; i <= endIndex; i++) {
+                if (this.peek(i) == null) {
+
+                } else {
+                    newList.add(peek(i));
+                }// Need Help.
+            }
+            return newList;
+        }
+    }
+
+    /**
+     * Adds elements from an array into ListArray T items Takes all elements
+     * from the toAdd array and adds them to items from ListArray T
+     *
+     * @param toAdd T[] some type of an array to add into items
+     */
+    @Override
+    public void addAll(T[] toAdd) {
+        if ((toAdd.length + numberOfItems) > capacity) {
+            if (print_error) {
+                System.out.println("FAILURE IN ADDALL: Array Doesn't have enough space.");
+            }
+        } else {
+            for (int i = 0; i < toAdd.length; i++) {
+                if (toAdd[i] == null) {
+
+                } else {
+                    this.add(toAdd[i]);
+                }
+            }
+        }
+    }
+
+    // *******************  Increase Capacity, addAll(ListArray), and trimToSize *************** //
+    /**
+     * Increases the capacity of items. Increases the capacity of items by
+     * adding the increment amount to the previous capacity of items.
+     *
+     * @param increment int - the amount to increase the capacity
+     */
+    private void increaseCapacity(int increment) {
+        capacity += increment;
+        @SuppressWarnings("unchecked")
+        T[] temp = (T[]) new Object[capacity];
+        for (int i = 0; i < numberOfItems; i++) {
+            temp[i] = items[i];
+        }
+        items = temp;
+    }
+
+    /**
+     * Sets the capacity of items to the exact amount of elements in the array.
+     * Sets the capacity of items to the exact amount of elements in the array.
+     */
+    public void trimToSize() {
+        if (capacity == 0) {
+            if (print_error) {
+                System.out.println("FAILURE IN TRIMTOSIZE: Array is already at the lowest capacity: 0.");
+            }
+        }
+        int trim = numberOfItems - capacity;
+        increaseCapacity(trim);
+    }
+
+    /**
+     * Adds all elements of a ListArray t into items and increases capacity.
+     * Adds all the elements of an object into array items and increases the
+     * size if needed.
+     *
+     * @param toAdd - The array to be added.
+     */
+    public void addAll(ListArray<T> toAdd) {
+        if (toAdd.isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN ADDALL: Given Array has no elements.");
+            }
+            return;
+        }
+        if (toAdd.length() > (capacity - numberOfItems)) {
+            increaseCapacity(toAdd.length());
+        }
+        for (int i = 0; i < toAdd.length(); i++) {
+            if (toAdd.peek(i) == null) {
+
+            } else {
+                this.items[numberOfItems] = toAdd.peek(i);
+                numberOfItems++;
+            }
+        }
+    }// It runs, it runs, thats all that matters
+
+    /** Looks at the First element.
+     *  Looks at the First element.
+     * @return  T - returns First element.
+     */
+    @Override
+    public T peek() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return items[0];
+    }
+
+    /** Looks at the last element.
+     *  Looks at the last element.
+     * @return  T - returns last element.
+     */
+    @Override
+    public T peekLast() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return items[numberOfItems - 1];
+    }
+
+    /** Tests if array contains Object
+     * Tests if array contains Object
+     * @param object - the object to see if it exists.
+     * @return boolean - returns true or false.
+     */
+    @Override
+    public boolean contains(T object) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int check = find(object);
+        if (check >= 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /** Not defined for the toArray
+     * Not defined for list array.
+     * @return - null
+     */
+    public T[] toArray() {
+        return null;
+    }
+
+} // end class List
