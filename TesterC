@@ -1,0 +1,282 @@
+import java.lang.reflect.*;
+import java.util.Scanner;
+import java.io.*;
+
+
+public class TesterC {
+
+  static Song iggy = new Song("Dum Dum Boys","Iggy Pop","The Idiot","1977");
+  static Song pil = new Song("Swan Lake","Public Image Ltd.","Second Edition","1980");
+  static Song femmes = new Song("Add It Up","Violent Femmes","Violent Femmes","1983");
+
+  public static void main(String[] args) {
+
+    // Create a new empty song list with a description.
+    ListLinked<Song> songs = new ListLinked<>();
+
+    Song expect;
+    Song result;
+    int len;
+
+    System.out.println("----------   INITIALIZATION ------");
+    // Test Constructor
+    if (!songs.isEmpty()) {
+      printFail("isEmpty",true,songs.isEmpty());
+    }
+    if (songs.capacity() != 5) {
+      printFail("capacity",5,songs.capacity());
+    }
+
+    // Initial add() and peek() test
+    songs.add(iggy);
+    if (songs.length() != 1) {
+      printFail("add 1st",1,songs.length());
+    }
+    if (!songs.peek(0).equals(iggy)) {
+      printFail("add iggy",iggy,songs.peek(0));
+    }
+
+    /* If everything is passing above, we have what is needed to
+      check elements that are added and removed from the song list */
+
+    System.out.println("\n\n--- add(song), add(song,index), peek(index) -----");
+
+    // Test add method. Add up to capacity.
+    Song unknown = new Song();
+    songs.add(unknown); // 2 items
+    songs.add(unknown); // 3 items
+    songs.add(unknown); // 4 items
+    songs.add(pil); // 5 items
+    if (songs.length() != 5) {
+      printFail("add 5th",5,songs.length());
+    }
+    if (!songs.peek(4).equals(pil)) {
+      printFail("add pil at end",pil,songs.peek(4));
+    }
+
+    // Test add over capacity
+    System.out.print("EXPECT MSG add over capacity: ");
+    songs.add(unknown); // 6th item (over capacity)
+    if (songs.length() != 5) {
+      printFail("attempt over capacity",5,songs.length());
+    }
+    if (!songs.peek(4).equals(pil)) {
+      printFail("attempt over capacity",pil,songs.peek(4));
+    }
+
+    // Test add(song, index)
+    ListArray<Song> songs2 = new ListArray<>(10);
+
+    songs2.add(iggy, 0);
+    if (songs2.length() != 1) {
+      printFail("add at 0. length", 1, songs2.length());
+    }
+    if (!songs2.peek(0).equals(iggy)) {
+      printFail("add at 0. song", iggy, songs2.peek(0));
+    }
+    songs2.add(pil);
+    songs2.add(femmes);
+
+    // test add in the middle
+    len = songs2.length();
+    songs2.add(unknown,1);
+    if (songs2.length() != len+1) {
+      printFail("add middle, length", 1, songs2.length());
+    }
+    if (!songs2.peek(1).equals(unknown)) {
+      printFail("add middle. song", unknown, songs2.peek(1));
+    }
+
+    // test add to end
+    len = songs2.length();
+    songs2.add(pil, len);
+    if (songs2.length() != len+1) {
+      printFail("add end, length", len+1, songs2.length());
+    }
+    if (!songs2.peek(len).equals(pil)) {
+      printFail("add end. song", pil, songs2.peek(len));
+    }
+
+    // test add invalid
+    System.out.print("EXPECT MSG for add invalid index: ");
+    len = songs2.length();
+    songs2.add(iggy,len+2);
+    if (songs2.length() != len) {
+      printFail("add invalid idx, length", len, songs2.length());
+    }
+    if (iggy.equals(songs2.peek(songs.length()-1))) {
+      printFail("add at invalid idx, song", "null", songs.peek(songs.length()-1));
+    }
+
+    System.out.println("\n\n----   remove(), remove(index), removeAll() -----");
+
+    // Test remove() from a list with several elements
+
+    len = songs.length();
+    expect = songs.peek(len-1);
+    result = songs.remove();
+    if (songs.length() != len-1) {
+      printFail("remove length", len-1, songs.length());
+    }
+    System.out.print("EXPECT MSG index : ");
+    if (songs.peek(len-1) != null) {
+      printFail("remove null", "null", songs.peek(len-1));
+    }
+    if (!expect.equals(result)) {
+      printFail("remove song", expect, result);
+    }
+
+    songs.removeAll();
+    if (songs.length() != 0) {
+      printFail("remove all", 0, songs.length());
+    }
+
+    songs.add(iggy);
+    songs.add(pil);
+    songs.add(femmes);
+    songs.add(unknown);
+
+    // Test remove(index) : last element
+    len = songs.length();
+    expect = songs.peek(len-1);
+    result = songs.remove(len-1);
+    if (songs.length() != len-1) {
+      printFail("remove idx len-1. length", len-1, songs.length());
+    }
+    System.out.print("EXPECT MSG index : ");
+    if (songs.peek(len-1) != null) {
+      printFail("remove idx len-1 null", "null", songs.peek(4));
+    }
+    if (!expect.equals(result)) {
+      printFail("remove idx len-1 song", expect, result);
+    }
+
+    // Test remove(index) : middle element
+    len = songs.length();
+    expect = songs.peek(len-2);
+    result = songs.remove(len-2);
+    if (songs.length() != len-1) {
+      printFail("remove idx middle. length", len-1, songs.length());
+    }
+    System.out.print("EXPECT MSG index : ");
+    if (songs.peek(len-1) != null) {
+      printFail("remove idx middle null", "null", songs.peek(4));
+    }
+    if (!expect.equals(result)) {
+      printFail("remove idx middle song", expect, result);
+    }
+
+    // Test remove(index) : iggy should be at index 0
+    len = songs.length();
+    expect = songs.peek(0);
+    result = songs.remove(0);
+    if (songs.length() != len-1) {
+      printFail("remove 0 length", len-1, songs.length());
+    }
+    System.out.print("EXPECT MSG index : ");
+    if (songs.peek(len-1) != null) {
+      printFail("remove first null", "null", songs.peek(4));
+    }
+    if (!expect.equals(result)) {
+      printFail("remove first song", expect, result);
+    }
+
+    // test remove(index) invalid index
+    System.out.print("EXPECT MSG for remove invalid index: ");
+    len = songs.length();
+    result = songs.remove(songs.length()+1);
+    if (result != null) {
+      printFail("remove invalid idx", "null", result);
+    }
+    if (songs.length() != len) {
+      printFail("remove invalid idx, length", len, songs.length());
+    }
+
+    // Test remove() from list of 1 then empty list
+    songs.removeAll();
+    songs.add(iggy);
+    result = songs.remove();
+    if (songs.length() != 0) {
+      printFail("remove from list of 1, length", 0, songs.length());
+    }
+    if (!result.equals(iggy)) {
+      printFail("remove from list of 1, song", iggy, result);
+    }
+
+    System.out.println("\n\n----   set(position,value) -----");
+    songs.removeAll();
+    songs.add(iggy);
+    songs.add(femmes);
+    songs.add(pil);
+
+    len = songs.length();
+    songs.set(0,unknown);
+    if (len != songs.length()) {
+      printFail("set 0 length",len,songs.length());
+    }
+    if (!unknown.equals(songs.peek(0))) {
+      printFail("Set 0 song",unknown,songs.peek(0));
+    }
+
+    Song lalala = new Song("la","la","la");
+    len = songs.length();
+    songs.set(2,lalala);
+    if (len != songs.length()) {
+      printFail("set last length",len,songs.length());
+    }
+    if (!lalala.equals(songs.peek(2))) {
+      printFail("Set last song",lalala,songs.peek(2));
+    }
+
+    len = songs.length();
+    songs.set(5,unknown);
+    if (len != songs.length()) {
+      printFail("set invalid length",len,songs.length());
+    }
+    if (null != songs.peek(5)) {
+      printFail("Set invalid song",null,songs.peek(5));
+    }
+
+    System.out.println("\n\n----   toArray(emptyArray) -----");
+
+    Song[] one = new Song[1];
+    Song[] three = new Song[3];
+
+    songs.removeAll();
+    songs.add(iggy);
+    one[0] = null;
+    songs.toArray(one);
+    if (!one[0].equals(iggy)) {
+      printFail("toArray one with 1 song",iggy,one[0]);
+    }
+    three[0] = null;
+    songs.toArray(three);
+    if (!three[0].equals(iggy)) {
+      printFail("toArray three with 1 song",iggy,three[0]);
+    }
+
+    songs.add(femmes);
+    songs.add(pil);
+    songs.toArray(three);
+    for (int i=0; i<3; i++) {
+      if (!songs.peek(i).equals(three[i])) {
+        printFail("toArray i="+i,songs.peek(i),three[i]);
+        break;
+      }
+    }
+    
+    one[0] = null;
+    songs.toArray(one);
+    if (one[0] == null) {
+      printFail("toArray one with 3 songs",null,one[0]);
+    }
+
+
+
+  } // end main()
+
+  static void printFail(String desc, Object expected, Object result) {
+    System.out.println(desc+" expected "+expected.toString()+" ("+result.toString()+")");
+  }
+
+} // end class Main
