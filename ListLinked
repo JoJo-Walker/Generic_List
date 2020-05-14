@@ -1,0 +1,653 @@
+
+/** List implemented with Linked List.items in the list are stored in a linked list, but are considered to have a position.
+ * The use of index in the descriptions refers to the position relative to the head of the list (i.e. the head is at index 0, head.next is at index 1).
+ *
+ * @param <T> For a general data type
+ * @author Joseph Walker
+ */
+public class ListLinked<T> implements List<T> {
+
+    /**
+     * A class to specify the nodes inbetween, head, and tail. Node Class within
+     * list in order to connect the list together
+     */
+    class Node {
+
+        T data;
+        Node next;
+
+        Node() {
+            data = null;
+            next = null;
+        }
+
+        Node(T obj) {
+            data = obj;
+            next = null;
+        }
+    } // end class Node
+
+    /**
+     * The first element in the list The first element in the list
+     */
+    private Node head = null;
+
+    /**
+     * The last element in the list The last element in the list
+     */
+    private Node tail = null;
+
+    /**
+     * The number of items in the array. The number of items in the array.
+     */
+    private int numberOfItems = 0;
+
+    /**
+     * Default Constructor Default Constructor
+     */
+    public ListLinked() {
+    }
+
+    /**
+     * Controls the amount of print errors. Is true if an error is printed. Will
+     * print an error if a method has an error.
+     */
+    private boolean print_error = true;
+
+    // ************   SETTERS, GETTERS, toPrint ******************* //
+    /**
+     * A setter for the boolean print_error A setter for the boolean
+     * print_error.
+     *
+     * @param change boolean - for print errors true or false
+     */
+    public void print_error(boolean change) {
+        this.print_error = change;
+    }
+
+    /**
+     * A getter for number of elements in the list A getter for number of
+     * elements in the list
+     *
+     * @return Int - for the amount of elements in the list
+     */
+    @Override
+    public int length() {
+        return numberOfItems;
+    }
+
+    /**
+     * Capacity is infinite with linked list Capacity is infinite with linked
+     * list
+     *
+     * @return int capacity default -1
+     */
+    @Override
+    public int capacity() {
+        return -1;
+    }
+
+    /**
+     * Lists are never full, therefore will always return false.
+     *
+     * @return false always.
+     */
+    @Override
+    public boolean isFull() {
+        return false;
+    }
+
+    /**
+     * Returns a boolean if the list has no elements or at least one.
+     *
+     * @return True if no elements in data structure.
+     */
+    @Override
+    public boolean isEmpty() {
+        return (numberOfItems == 0);
+    }
+
+    /**
+     * Prints numbered list of songs(Does toString things). Prints numbered list
+     * of songs.
+     */
+    @Override
+    public String toString() {
+        Node current = head;
+        int i = 1;
+        String printedList = "";
+        while (current != null) {
+            printedList += i + ". " + current.data.toString() + "\n";
+            current = current.next;
+            i++;
+        }
+        return printedList;
+    } // end toString()
+
+    /**
+     * Overwrites an element at the specified index. Overwrites an element at
+     * the specified index.
+     *
+     * @param position Int - the index to overwrite an element.
+     * @param value T - the data to overwrite with.
+     */
+    @Override
+    public void set(int position, T value) {
+        Node currNode = head;
+        int index = 0;
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN SET: List is empty");
+            }
+            return;
+        }
+        if (head == tail) {
+            if (print_error) {
+                head.data = value;
+            }
+            return;
+        }
+        if (position >= numberOfItems) {
+            if (print_error) {
+                System.out.println("FAILUR IN SET: Index is beyond NOI.");
+            }
+            return;
+        }
+        while (index < position) {
+            currNode = currNode.next;
+            index++;
+        }
+        currNode.data = value;
+    }
+
+    /**
+     * Returns a data type at a specified index without removing. Same as get,
+     * but using the Queue vocabulary.
+     *
+     * @param index Int - the index to look at the data.
+     * @return T the data type at the index.
+     */
+    @Override
+    public T peek(int index) {
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN PEEK(Index): List is empty.");
+            }
+            return null;
+        }
+        if (index >= numberOfItems) {
+            if (print_error) {
+                System.out.println("FAILURE IN PEEK(INDEX): Index is greater than the NOI.");
+            }
+            return null;
+        }
+        Node currNode = head;
+        int count = 0;
+        while (count < index) {
+            currNode = currNode.next;
+            count++;
+        }
+        return currNode.data;
+    }
+
+    /**
+     * Return the FIRST element and does not remove from list. Return the FIRST
+     * element, but do not remove from list.
+     *
+     * @return T - First element in list.
+     */
+    @Override
+    public T peek() {
+        if (isEmpty()) {
+            return null;
+        } else {
+            return head.data;
+        }
+    }
+
+    /**
+     * Return the Last element and does not remove from list. Return the Last
+     * element, but do not remove from list.
+     *
+     * @return T - Last element in list.
+     */
+    @Override
+    public T peekLast() {
+        if (isEmpty()) {
+            return null;
+        } else {
+            return tail.data;
+        }
+    }
+    // *******************   REMOVE and ADD ******************* //
+
+    /**
+     * Remove and return the last element of the list. Remove and return the
+     * last element of the list.
+     *
+     * @return Returns the last element in the list.
+     */
+    @Override
+    public T remove() {
+        if (head == null) {
+            return null;
+        }
+        T temp = tail.data;
+        if (head == tail) {
+            head = tail = null;
+            numberOfItems--;
+            return temp;
+        }
+        Node currNode = head;
+        while (currNode.next != tail) {
+            currNode = currNode.next;
+        }
+        tail = currNode;
+        tail.next = null;
+        numberOfItems--;
+        return temp;
+    }
+
+    /**
+     * Removes and returns an element at the given index. Remove and return the
+     * element at index. Then shifts list.
+     *
+     * @param index Int - the index to remove.
+     * @return T - the data that is removed.
+     */
+    @Override
+    public T remove(int index) {
+        Node currNode = head;
+        Node prevNode = currNode;
+        int count = 0;
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN REMOVE(INT INDEX): List is empty.");
+            }
+            return null;
+        }
+        if (index > numberOfItems) {
+            if (print_error) {
+                System.out.println("FAILURE IN REMOVE(INT INDEX): Invalid Index");
+            }
+            return null;
+        }
+        if (index == numberOfItems - 1) {
+            while (currNode.next != tail) {
+                currNode = currNode.next;
+            }
+            currNode.next = null;
+            tail = currNode;
+            numberOfItems--;
+            return tail.data;
+        }
+        if (head == tail) {
+            head = null;
+            tail = null;
+            numberOfItems--;
+            return currNode.data;
+        }
+        while (count != index) {
+            prevNode = currNode;
+            currNode = currNode.next;
+            count++;
+        }
+        prevNode.next = currNode.next;
+        T myData = currNode.data;
+        numberOfItems--;
+        return myData;
+    }
+
+    /**
+     * Remove the element that is equal to the given object. Remove the element
+     * that is equal to the given object.
+     *
+     * @param object T - the data to remove from the list.
+     */
+    @Override
+    public void remove(T object) {
+        Node currNode = head;
+        Node prevNode = currNode;
+        int index = find(object);
+        int count = 0;
+        if (index == -1) {
+            if (print_error) {
+                System.out.println("FAILURE IN REMOVE(T OBJECT): List does not contain the object" + object);
+            }
+            return;
+        }
+        if (numberOfItems == 1) {
+            head = null;
+            tail = null;
+            numberOfItems--;
+            return;
+        }
+        if (head.data.equals(object)) {
+            head = head.next;
+            numberOfItems--;
+            return;
+        }
+        if (tail.data.equals(object)) {
+            while (currNode.next != tail) {
+                currNode = currNode.next;
+            }
+            currNode.next = null;
+            tail = currNode;
+            numberOfItems--;
+            return;
+        }
+        while (count < index) {
+            prevNode = currNode;
+            currNode = currNode.next;
+            count++;
+        }
+        prevNode = currNode.next;
+        currNode = null;
+        numberOfItems--;
+    }
+
+    /**
+     * Remove all elements in the list. Remove all elements in the list. Sets
+     * NOI to 0.
+     */
+    @Override
+    public void removeAll() {
+        head = tail = null;
+        numberOfItems = 0;
+    }
+
+    /**
+     * Removes the last instance of the data type. Removes the last element of
+     * the data type.
+     *
+     * @param value T - The data to be removed.
+     */
+    public void removeLast(T value) {
+        Node currNode = head;
+        Node prevNode = currNode;
+        int check = find(value);
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN REMOVELAST: List is empty.");
+            }
+            return;
+        }
+        if (check == -1) {
+            if (print_error) {
+                System.out.println("FAILURE IN REMOVELAST: Element not in the list.");
+            }
+            return;
+        }
+        if (head == tail) {
+            head = tail = null;
+            return;
+        }
+        int index = 0;
+        int lastElmnt = -1;
+        while (currNode.next != null) {
+            if (currNode.data.equals(value)) {
+                lastElmnt = index;
+            }
+            prevNode = currNode;
+            currNode = currNode.next;
+            index++;
+        }
+        if (lastElmnt > -1) {
+            remove(lastElmnt);
+        }
+    }
+
+    /** Removes any duplicates that are in the list.
+     * Removes any duplicates within the list.
+     */
+    public void removeDuplicates() {
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN REMOVEDUPLICATES: List is empty.");
+            }
+            return;
+        }
+        if (numberOfItems == 1) {
+            if (print_error) {
+                System.out.println("FAILURE IN REMOVEDUPLICATES: List has one element.");
+            }
+            return;
+        }
+        for (int i = 0; i < numberOfItems; i++) {
+            for (int j = numberOfItems - 1; j > i; j--) {
+                if (peek(i).equals(peek(j))) {
+                    remove(j);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add object to the end of the list. Add object to the end of the list.
+     *
+     * @param object T- the element to add.
+     */
+    @Override
+    public void add(T object) {
+        Node newNode = new Node(object);
+        if (isEmpty()) {
+            head = newNode;
+            tail = newNode;
+            numberOfItems++;
+        } else {
+            tail.next = newNode;
+            tail = newNode;
+            numberOfItems++;
+        }
+    }
+
+    /**
+     * Add object at position index, shifting elements to make room. Add object
+     * at position index, shifting elements to make room.
+     *
+     * @param object T - the data to add.
+     * @param index Int - the index to add at.
+     */
+    @Override
+    public void add(T object, int index) {
+        Node currNode = head;
+        Node prevNode = currNode;
+        Node newNode = new Node(object);
+        int count = 0;
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN ADD(T OBJECT, INT INDEX: List is empty.");
+            }
+            return;
+        }
+        if (index == numberOfItems) {
+            add(object);
+        } else {
+            while (count != index) {
+                prevNode = currNode;
+                currNode = currNode.next;
+                count++;
+            }
+            prevNode.next = newNode;
+            newNode.next = currNode;
+            numberOfItems++;
+        }
+    }
+
+    /**
+     * Add all the elements in toAdd to the list. Add all the elements in toAdd
+     * to the list.
+     *
+     * @param toAdd T[] the array to add elements from.
+     */
+    @Override
+    public void addAll(T[] toAdd) {
+        Node newNode = new Node();
+        Node currNode = head;
+        int count = 0;
+        if (toAdd[0] == null) {
+            if (print_error) {
+                System.out.println("FAILURE IN ADDALL(T[] TOADD): Given Array has no elemnts.");
+            }
+            return;
+        }
+        if (isEmpty()) {
+            while (count < toAdd.length) {
+                add(toAdd[count]);
+                count++;
+            }
+        }
+        while (count < toAdd.length) {
+            add(toAdd[count]);
+            count++;
+        }
+    }
+
+    // *******************   OTHER *************** //
+    /**
+     * Tests if list contains Object Tests if list contains Object
+     *
+     * @param object - the object to see if it exists.
+     * @return boolean - returns true or false.
+     */
+    @Override
+    public boolean contains(T object) {
+        if (isEmpty()) {
+            return false;
+        } else {
+            int check = find(object);
+            return check != -1;
+        }
+    }
+
+    /**
+     * Find the index of song. Find the index of song.
+     *
+     * @param object T - the object to find.
+     * @return Int - the index of the object.
+     */
+    @Override
+    public int find(T object) {
+        int count = 0;
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN FIND: List is empty;");
+            }
+            return -1;
+        }
+        if (head.data.equals(object)) {
+            return 0;
+        }
+        Node currNode = head;
+        while (count < numberOfItems) {
+            if (currNode.data.equals(object)) {
+                return count;
+            }
+            currNode = currNode.next;
+            count++;
+        }
+        return -1;
+    }
+
+    /**
+     * Create a new ListLinked with elements from this list. Create a new
+     * ListLinked with elements from this list.The startIndex and endIndex are
+     * inclusive.
+     *
+     * @param startIndex Int - the beginning of the listLinked.
+     * @param endIndex Int - the ending of the listLinked.
+     * @return ListLinked filled with elements.
+     */
+    @Override
+    public ListLinked<T> sublist(int startIndex, int endIndex) {
+        ListLinked<T> newList = new ListLinked<>();
+        Node currNode = head;
+        int currIndex = 0;
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN sublist: List is empty.");
+            }
+            return null;
+        }
+        if (startIndex > endIndex) {
+            if (print_error) {
+                System.out.println("FAILURE IN SUBLIST: Starting index is greater than ending index.");
+            }
+            return null;
+        }
+        if (numberOfItems < endIndex) {
+            if (print_error) {
+                System.out.println("FAILURE IN SUBLIST: endIndex extends beyond List." + endIndex);
+            }
+            return null;
+        }
+        while (currIndex != startIndex) {
+            currNode = currNode.next;
+            currIndex++;
+        }
+        newList.head = currNode;
+        while (currIndex <= endIndex) {
+            newList.add(currNode.data);
+            currNode = currNode.next;
+            currIndex++;
+        }
+        return newList;
+    }
+
+    /**
+     * Copy all the elements in the list into array. Copy all the elements in
+     * the list into array.
+     *
+     * @param array T[] - general type of array.
+     */
+    @Override
+    public void toArray(T[] array) {
+        Node currNode = head;
+        int index = 0;
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN TOARRAY(T[] ARRAY): List is empty.");
+            }
+            return;
+        }
+        if (array.length > numberOfItems) {
+            while (currNode.next != null) {
+                array[index] = currNode.data;
+                currNode = currNode.next;
+                index++;
+            }
+            return;
+        }
+        while (index < array.length) {
+            array[index] = currNode.data;
+            currNode = currNode.next;
+            index++;
+        }
+    }
+
+    /**
+     * Copy all the elements in the list into array. Copy all the elements in
+     * the list into array.
+     *
+     * @return T[] - returns the array with new elements from list.
+     */
+    public T[] toArray() {
+        if (isEmpty()) {
+            if (print_error) {
+                System.out.println("FAILURE IN TOARRAY(T[] ARRAY): List is empty.");
+            }
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        T[] newArray = (T[]) new Object[numberOfItems];
+        Node currNode = head;
+        int index = 0;
+        while (currNode.next != null) {
+            newArray[index] = currNode.data;
+            currNode = currNode.next;
+            index++;
+        }
+        return newArray;
+    }
+
+} // end class List
