@@ -1,0 +1,394 @@
+
+/**
+ *
+ * @author Joseph Walker
+ */
+public class Test extends Main {
+
+    //private static ListArray<Song> songs = new ListArray<>(5);
+    private static ListLinked<Song> songs = new ListLinked<>();
+    private static int arrayLength;
+
+    /**
+     * Three base songs created
+     *
+     */
+    static Song iggy = new Song("Dum Dum Boys", "Iggy Pop", "The Idiot", "1977");
+    static Song pil = new Song("Swan Lake", "Public Image Ltd.", "Second Edition", "1980");
+    static Song femmes = new Song("Add It Up", "Violent Femmes", "Violent Femmes", "1983");
+
+    public static void print_error(boolean data) {
+        songs.print_error(data);
+    }
+
+    static void printFail(String desc, Object expected, Object result) {
+        System.out.println(desc + " expected " + expected.toString() + " (" + result.toString() + ")");
+    }
+
+    /**
+     * Test all add methods
+     *
+     */
+    public static void testAddMethods() {
+        // Test initial add()
+        songs.add(iggy);
+        if (songs.length() != 1) {
+            printFail("add 1st", 1, songs.length());
+        }
+
+        Song unknown = new Song();
+        songs.add(unknown); // 2 items
+        songs.add(unknown); // 3 items
+        songs.add(unknown); // 4 items
+        songs.add(pil); // 5 items
+        if (songs.length() != 5) {
+            printFail("add 5th", 5, songs.length());
+        }
+        if (!songs.peek(4).equals(pil)) {
+            printFail("add pil at end", pil, songs.peek(4));
+        }
+
+        // Test add() over capacity
+        songs.add(unknown); // 6th item (over capacity)
+        if (songs.length() != 5) {
+            printFail("attempt over capacity", 5, songs.length());
+        }
+
+        // Removing an element for space for the add(T, int)
+        songs.remove();
+
+        // Test initial add(T, int) 
+        songs.add(unknown, 1);
+        if (!songs.peek(1).equals(unknown)) {
+            printFail("Test Fail: Didnt Remove", unknown, songs.peek(1));
+        }
+
+        // Test add(T, int) when array is full.
+        songs.add(pil, 2);
+        if (songs.peek(2).equals(pil)) {
+            printFail("Test Fail: Added the song when the array was full", unknown, songs.peek(2));
+        }
+
+        // Removing an element for space for the add(T, int)
+        songs.remove();
+
+        // Test add(T, int) with an index out of bounds
+        songs.add(unknown, 6);
+        if (songs.capacity() > 5) {
+            printFail("Test Fail: Add increased capacity: ", 5, songs.capacity());
+        }
+
+        // Creating new Song[] and ListArray<Song> to test addAll methods.
+        ListArray<Song> newList = new ListArray<>(5);
+        Song[] newSong = new Song[2];
+        newList.add(femmes);
+        newList.add(pil);
+        newList.add(iggy);
+        newSong[0] = femmes;
+        newSong[1] = pil;
+
+        songs.removeAll();// Emptying the ListArray songs
+
+        // Test addAll(T[]) with enough open space
+        songs.addAll(newSong);
+        if (!songs.peek(0).equals(femmes)) {
+            printFail("Test Fail: addAll Failed", femmes, songs.peek(0));
+        }
+
+        // Test addAll(T[]) without enough space
+        songs.addAll(newSong);
+        if (songs.peek(3) == null) {
+            printFail("Test Fail: addAll Failed", femmes, songs.peek(4));
+        }
+
+//        if (songs.capacity() > -1) {
+//            // Test addAll(ListArray<T>) Increasing Capacit
+//            arrayLength = songs.capacity();
+//            songs.addAll(newList);
+//            if (songs.capacity() == arrayLength) {
+//                printFail("Test Fail: addAll(ListArray<T>) Failed", songs.capacity() + newList.length(), songs.capacity());
+//            }
+//
+//            // Test addAll(ListArray<T>) Increasing Capacity
+//            arrayLength = songs.capacity();
+//            songs.addAll(newList);
+//            if (songs.capacity() == arrayLength) {
+//                printFail("Test Fail: addAll(ListArray<T>) Failed", songs.capacity() + newList.length(), songs.capacity());
+//            }
+//
+//            // Test addAll(ListArray<T>) when the input array has no elements
+//            newList.removeAll();
+//            arrayLength = songs.capacity();
+//            songs.addAll(newList);
+//            if (songs.capacity() != arrayLength) {
+//                printFail("Test Fail: addAll(ListArray<T>) Failed", arrayLength, songs.capacity());
+//            }
+//        }
+
+    } // End testAddMethod()
+
+    /**
+     * Tests all Remove methods
+     *
+     */
+    public static void testRemoveMethods() {
+
+        // Test removeAll()
+        songs.removeAll();
+        if (songs.length() != 0) {
+            printFail("remove all", 0, songs.length());
+        }
+
+        // Test remove() from an empty array
+        songs.remove();
+        if (!songs.isEmpty()) {
+            printFail("Test Fail: Didnt Remove", null, songs.peek(0));
+        }
+
+        Song unknown = new Song();
+        songs.add(iggy); // 1st Item
+        songs.add(unknown); // 2nd Item
+        songs.add(unknown); // 3rd Item
+        songs.add(pil); // 4th Item
+
+        // Test remove() with elements in the array
+        arrayLength = songs.length();
+        songs.remove();
+        if (songs.length() == arrayLength) {
+            printFail("Test Fail: Didnt Remove", arrayLength - 1, songs.length());
+        }
+
+        // Test remove() when array has one element
+        songs.removeAll();
+        songs.add(pil);
+        songs.remove();
+        if (!songs.isEmpty()) {
+            printFail("Test Fail: Didnt Remove", null, songs.peek(0));
+        }
+
+        songs.add(iggy); // 1st Item
+        songs.add(unknown); // 2nd Item
+        songs.add(unknown); // 3rd Item
+        songs.add(pil); // 4th Item
+
+        // Test remove(index)
+        songs.remove(1);
+        if (songs.peek(1).equals(pil)) {
+            printFail("Test Fail: Didnt Remove", pil, songs.peek(1));
+        }
+
+        // Test remove(index) out of bounds
+        songs.remove(6);
+        if (songs.peek(6) != null) {
+            printFail("Test Fail: Didnt Remove", null, songs.peek(6));
+        }
+
+        // Test remove(Song)
+        songs.remove(iggy);
+        if (songs.peek(0).equals(iggy)) {
+            printFail("Test Fail: Didnt Remove", iggy, songs.peek(0));
+        }
+
+        // Test remove(Song) not in array
+        Song test = new Song("Heart and Soul - 2007 Remaster", "Joy Division", "Closer", "1980");
+        songs.remove(test);
+        if (songs.find(test) != -1) {
+            printFail("Test Fail: Didnt Remove", null, songs.peek(2));
+        }
+
+    }// End testRemoveMethod()
+
+    /**
+     * Tests Find method
+     *
+     */
+    public static void testFindMethods() {
+        Song test = new Song("Heart and Soul - 2007 Remaster", "Joy Division", "Closer", "1980");
+        Song unknown = new Song();
+        songs.add(iggy); // 1st Item
+        songs.add(unknown); // 2nd Item
+        songs.add(unknown); // 3rd Item
+        songs.add(pil); // 4th Item
+
+        int index = songs.find(iggy);
+        if (songs.find(iggy) != index) {
+            printFail("Test Fail: Didnt Find", index, songs.find(iggy));
+        }
+
+        index = songs.find(test);
+        if (songs.find(test) != index) {
+            printFail("Test Fail: Didnt Find", index, songs.find(iggy));
+        }
+    }// End testFindMethod()
+
+    /**
+     * Test Peek method
+     *
+     */
+    public static void testPeekMethods() {
+        Song test = new Song("Heart and Soul - 2007 Remaster", "Joy Division", "Closer", "1980");
+        Song unknown = new Song();
+        songs.add(iggy); // 1st Item
+        songs.add(unknown); // 2nd Item
+        songs.add(test); // 3rd Item
+
+        // Test peek(index)
+        if (!(songs.peek(0).equals(unknown))) {
+            printFail("Test Fail: Didnt Peek", unknown, songs.peek(0));
+        }
+
+        // Test peek(index) invalid index
+        Song temp = songs.peek(5);
+        if (songs.peek(9) != null) {
+            printFail("Test Fail: Didnt Peek", unknown, songs.peek(5));
+        }
+
+        if (songs.capacity() == -1) {
+            temp = songs.peek();
+            if (!songs.peek(0).equals(temp)) {
+                printFail("Test Fail: Didnt Peek", temp, songs.peek(0));
+            }
+
+            temp = songs.peekLast();
+            if (!songs.peek(songs.length() - 1).equals(temp)) {
+                printFail("Test Fail: Didnt Peek", temp, songs.peek(songs.length() - 1));
+            }
+        }
+    } // End testPeekMethod()
+
+    /**
+     * Test Set method
+     *
+     */
+    public static void testSetMethods() {
+        Song unknown = new Song();
+        songs.add(iggy);
+        songs.add(unknown);
+        songs.add(unknown);
+        songs.add(pil);
+
+        // Test set(index, song)
+        songs.set(1, femmes);
+        if (!songs.peek(1).equals(femmes)) {
+            printFail("Test Fail: Didnt Set", femmes, songs.peek(1));
+        }
+
+        songs.set(6, femmes);
+        if (songs.peek(6) == null) {
+            printFail("Test Fail: Didnt Set 6", femmes, songs.peek(6));
+        }
+    }// End testSetMethod(index, data)
+
+    /**
+     * Test toArray method
+     *
+     */
+    public static void testToArrayMethods() {
+        Song unknown = new Song();
+        songs.add(iggy);
+        songs.add(unknown);
+
+        Song[] mySongs = new Song[5];
+
+        // Test toArray(song[]) with an empty array
+        songs.toArray(mySongs);
+        if (mySongs[0] != null) {
+            printFail("Test Fail: toArray Failed", "null", mySongs[0]);
+        }
+
+        // Test toArray(Song[]) with a smaller array
+        mySongs = new Song[3];
+        songs.toArray(mySongs);
+        if (mySongs[0] == null) {
+            printFail("Test Fail: toArray Failed", "null", mySongs[0]);
+        }
+
+        // Testing toArray(Song[]) with a larger array
+        mySongs = new Song[10];
+        songs.toArray(mySongs);
+        if (mySongs[0] == null) {
+            printFail("Test Fail: toArray Failed", "null", mySongs[0]);
+        }
+
+//        if (songs.capacity() > -1) {
+//
+//        } else {
+//            mySongs = new Song[10];
+//            mySongs = songs.toArray();
+//            if (mySongs[0] instanceof Song) {
+//                System.out.println("Array Worked.");
+//            }
+//        }
+    } // End testToArrayMethod()
+
+    /**
+     * Test Sub list method
+     *
+     */
+    public static void testSublistMethods() {
+//        if (songs.capacity() > -1) {
+//            ListArray<Song> newList = new ListArray<>(5);
+//
+//            // Test sublist(index, index)
+//            newList.removeAll();
+//            newList = songs.sublist(0, 3);
+//            if (newList.peek(0) == null) {
+//                printFail("Test Fail: Sublist Failed", null, newList.peek(1));
+//            }
+//
+//            // Test sublist(index, index)
+//            newList.removeAll();
+//            newList = songs.sublist(7, 3);
+//        } else {
+            ListLinked<Song> newList = new ListLinked<>();
+
+            // Test sublist(index, index)
+            newList.removeAll();
+            newList = songs.sublist(0, 3);
+            if (newList.peek(0) == null) {
+                printFail("Test Fail: Sublist Failed", null, newList.peek(1));
+            }
+
+            // Test sublist(index, index)
+            newList.removeAll();
+            newList = songs.sublist(7, 3);
+        
+    }// End testSublistMethod(index, index)
+
+    /**
+     * Test TrimToSize method
+     *
+     */
+//    public static void testTrimToSizeMethods() {
+//        if (songs.capacity() > -1) {
+//            Song unknown = new Song();
+//
+//            songs.add(iggy);
+//            songs.add(unknown);
+//            songs.add(unknown);
+//
+//            // Test trimToSize()
+//            arrayLength = songs.capacity();
+//            songs.trimToSize();
+//            if (songs.capacity() == arrayLength - 2) {
+//                printFail("Test Fail: trimToSize Failed", arrayLength - 2, songs.capacity());
+//            }
+//
+//            // Test trimToSize() to make capacity 0
+//            songs.removeAll();
+//            arrayLength = songs.capacity();
+//            songs.trimToSize();
+//            if (songs.capacity() == arrayLength) {
+//                printFail("Test Fail: trimToSize Failed", 0, songs.capacity());
+//            }
+//
+//            // Test trimToSize() with no capacity
+//            arrayLength = songs.capacity();
+//            songs.trimToSize();
+//            if (songs.capacity() != arrayLength) {
+//                printFail("Test Fail: trimToSize Failed", 0, songs.capacity());
+//            }
+//        }
+//
+//    }
+}
