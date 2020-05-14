@@ -1,0 +1,39 @@
+
+import java.util.Arrays;
+
+
+/** Main file to test ListArray or ListLinked
+ * Main file which runs tests for each method either within a ListArray
+ * or a ListLinked in order to test/debug
+ * @author Joseph Walker
+ */
+public class Main {
+    
+    static Song iggy = new Song("Dum Dum Boys", "Iggy Pop", "The Idiot", "1977");
+    static Song pil = new Song("Swan Lake", "Public Image Ltd.", "Second Edition", "1980");
+    static Song femmes = new Song("Add It Up", "Violent Femmes", "Violent Femmes", "1983");
+    
+    public static void main(String[] args) {
+        Test.print_error(false);// Set true or false for printing errors
+        
+        // The gauntlent of tests
+        Test.testAddMethods();
+        Test.testRemoveMethods();
+        Test.testFindMethods();
+        Test.testPeekMethods();
+        Test.testSetMethods();
+        Test.testToArrayMethods();
+        Test.testSublistMethods();
+//        Test.testTrimToSizeMethods();
+        
+        // Misc Test Files
+//        ListLinked<Song> songs = new ListLinked<>();
+//        songs.add(pil);
+//        songs.add(iggy);
+//        songs.add(pil);
+//        songs.add(pil);
+//        songs.add(femmes);
+//        songs.removeDuplicates();
+//        System.out.println(songs.toString());
+    } // end main() 
+} // end class Main
