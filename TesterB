@@ -1,0 +1,57 @@
+/////////////////////////Not The Author/////////////////////////////
+
+import java.lang.reflect.*;
+import java.util.Scanner;
+import java.io.*;
+
+
+public class TesterA {
+
+  public static void main(String[] args) {
+
+    System.out.println("\n\n---- addAll(T[] toAdd), increases capacity -----");
+
+    ListArray<Integer> addTo = new ListArray<>(5);
+
+    ListArray<Integer> from = new ListArray<>(10);
+    for (int i=0; i<3; i++) {
+      from.add(i);
+    }
+
+    addTo.addAll(from);
+    if (addTo.length() != 3) {
+      printFail("addAll list to list, length", 3, addTo.length());
+    }
+    for (int i=0; i<3; i++) {
+      if (!addTo.peek(i).equals(from.peek(i))) {
+        printFail("addAll list to list 3, vals i="+i,from.peek(i),addTo.peek(i));
+      }
+    }
+
+    from.removeAll();
+    for (int i=0; i<8; i++) {
+      from.add(i);
+    }
+    addTo.removeAll();
+    addTo.addAll(from);
+    if (addTo.length() < 8 ) {
+      printFail("addAll, length increased", 8, addTo.length());
+    }
+
+    System.out.println("\n----   trimToSize -----");
+
+    ListArray<Integer> trim = new ListArray<>(100);
+    trim.add(0);
+    trim.add(1);
+    trim.add(2);
+    trim.trimToSize();
+    if (trim.length() != 3) {
+      printFail("trim to size", 3, trim.length());
+    }
+  } // end main()
+
+  static void printFail(String desc, Object expected, Object result) {
+    System.out.println(desc+" expected "+expected.toString()+" ("+result.toString()+")");
+  }
+
+} // end class Main
